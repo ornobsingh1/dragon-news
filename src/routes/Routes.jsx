@@ -14,10 +14,6 @@ const router = createBrowserRouter([
     path: "/news",
     element: <div>News Layout</div>,
   },
-  {
-    path: "/*",
-    element: <h2>Error 404</h2>,
-  },
 ]);
 
 export default router;
