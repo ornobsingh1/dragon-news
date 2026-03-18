@@ -1,10 +1,12 @@
 import { use } from "react";
-import { Link } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import { AuthContext } from "../context/AuthContext";
 import { toast } from "react-toastify";
 
 const Login = () => {
   const { logIn, setUser } = use(AuthContext);
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -17,6 +19,7 @@ const Login = () => {
         setUser(user);
         console.log(user);
         toast.success("SignIn successful.");
+        navigate(`${location.state ? location.state : "/"}`);
       })
       .catch((error) => {
         toast.error(error.message);
@@ -38,6 +41,7 @@ const Login = () => {
               type="email"
               className="input w-full bg-base-200 border-none"
               placeholder="Enter your email address"
+              required
             />
             <label className="label font-semibold py-1">Password</label>
             <input
@@ -45,11 +49,14 @@ const Login = () => {
               type="password"
               className="input w-full bg-base-200 border-none"
               placeholder="Enter your password"
+              required
             />
             <div className="py-1">
               <a className="link link-hover">Forgot password?</a>
             </div>
-            <button type="submit" className="btn btn-primary mt-4">Login</button>
+            <button type="submit" className="btn btn-primary mt-4">
+              Login
+            </button>
             <div className="text-[13px] py-3 flex justify-center">
               <p className="text-accent">
                 Don’t Have An Account ?{" "}

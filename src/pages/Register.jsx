@@ -1,27 +1,64 @@
 import { use } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { AuthContext } from "../context/AuthContext";
 import { toast } from "react-toastify";
 
 const Register = () => {
-  const { createUser, setUser } = use(AuthContext);
+  const { createUser, setUser, updatedUser } = use(AuthContext);
+  const navigate = useNavigate();
 
   const handleRegister = (e) => {
     e.preventDefault();
-    const name = e.target.name?.value;
-    const photo = e.target.photo?.value;
+    const displayName = e.target.name?.value;
+    const photoURL = e.target.photo?.value;
     const email = e.target.email?.value;
     const password = e.target.password?.value;
 
+    // password validate...
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{6,}$/;
+    if (!passwordRegex.test(password)) {
+      return toast.error(
+        "Password must contain uppercase, lowercase, number, special character and be at least 6 characters.",
+      );
+    }
+
+    // createUser...
     createUser(email, password)
       .then((result) => {
         const user = result?.user;
-        setUser(user);
-        console.log(user);
-        toast.success("Signup successful!");
+        // updateUser...
+        updatedUser({ displayName, photoURL })
+          .then(() => {
+            // setUser(user);
+            setUser({ ...user, displayName, photoURL });
+            toast.success("Signup successful!");
+            navigate("/");
+          })
+          .catch((error) => {
+            toast.error(error.message);
+            setUser(user);
+          });
       })
       .catch((error) => {
-        toast.error(error.message);
+        let message = "";
+
+        if (error.code === "auth/email-already-in-use") {
+          message = "This email is already registered.";
+        } else if (error.code === "auth/invalid-email") {
+          message = "Invalid email address.";
+        } else if (error.code === "auth/operation-not-allowed") {
+          message = "Email/password accounts are not enabled.";
+        } else if (error.code === "auth/weak-password") {
+          message = "Password should be at least 6 characters.";
+        } else if (error.code === "auth/network-request-failed") {
+          message = "Network error. Please check your internet.";
+        } else if (error.code === "auth/too-many-requests") {
+          message = "Too many attempts. Try again later.";
+        } else {
+          message = "Something went wrong. Please try again.";
+        }
+        toast.error(message);
       });
   };
 

@@ -25,7 +25,11 @@ const Navbar = () => {
         <NavLink to="/career">Career</NavLink>
       </div>
       <div className="login-btn flex gap-3">
-        <img className="cursor-pointer" src={userIcon} alt="" />
+        <img
+          className="cursor-pointer w-11 h-11"
+          src={user ? user.photoURL : userIcon}
+          alt=""
+        />
 
         {user ? (
           <button
